@@ -8,6 +8,7 @@
 #include <sstream>
 #include <cassert>
 #include <algorithm>
+#include <thread>
 using namespace std;
 
 //initialises the starting game state
@@ -159,16 +160,11 @@ string WordleSolver::intToString(uint64_t iword) {
 }
 
 int WordleSolver::makeGuess(uint64_t guess) {
-    map<char, int> tmp_map = map<char, int>();
-    //generate target map
-    for (int j = 0; j < 5; j++) {
-        tmp_map[char(target >> 8*j)]++;
-    }
+    map<char, int> tmp_map = map<char, int>(target_map);
 
     //green
     for (int i = 0; i < 5; i++) {
         if (((guess >> 8*i) & 0xFF) == ((target >> 8*i) & 0xFF)) {
-            //cout << char(guess >> 8*j) << " " << j << " green" << endl;
             addGreen(i, char(guess >> 8*i));
             tmp_map[char(guess >> 8*i)]--;
         }
@@ -178,62 +174,28 @@ int WordleSolver::makeGuess(uint64_t guess) {
     for (int j = 0; j < 5; j++) {
         if (tmp_map.find((guess >> 8*j)) != tmp_map.end() && 
             tmp_map[(guess >> 8*j)] > 0 && ((guess >> 8*j) & 0xFF) != ((target >> 8*j) & 0xFF)) {
-            //cout << char(guess >> 8*j) << " " << j << " yellow" << endl;
             addYellow(j, char(guess >> 8*j));
             tmp_map[char(guess >> 8*j)]--;
         } else if (tmp_map.find((guess >> 8*j)) == tmp_map.end()){
-            //cout << char(guess >> 8*j) << " " << j << " grey" << endl;
             addGrey(j, char(guess >> 8*j));
         }
     }
     return possible_words.size();
 }
 
-void WordleSolver::testAll() {
-    ofstream myfile("output_ints.txt");
-    for (int j = 0; j < 100; j++) {
+void WordleSolver::testAll(int start, int end) {
+    //cout << "testing words from " << start << " to " << end << endl;
+    string filename = "output/output_ints" + to_string(start) + "_" + to_string(end) + ".txt";
+    ofstream myfile(filename);
+    for (int j = start; j < min(end, int(word_list.size())); j++) {
         setTargetInt(word_list[j]);
         for (int i = 0; i < word_list.size(); i++) {
             reset();
             myfile << makeGuess(word_list[i]) << ", ";
         }
         myfile << endl;
-        if (j%10 == 0) {
-            cout << j << endl;
+        if (start == 0 && j%20 == 0) {
+            cout << "Thread 1 has processed " << j << "/" << end << " words" << endl;
         }
     }
 }
-/*
-void WordleSolver::testWord(string test) {
-    vector<int> results = vector<int>(word_list.size());
-    for (int j = 0; j < word_list.size(); j++) {
-        reset();
-        setTarget(word_list[j]);
-        results[j] = makeGuess(test);
-    }
-
-    ofstream myfile(test+".txt");
-    for (int i = 0; i < word_list.size(); i++) {
-        myfile << word_list[i] << ", " << results[i] << "," << endl;
-    }
-}
-
-void WordleSolver::secondGuess(string first_guess) {
-    reset();
-    cout << "Possible words after first guess: " << possible_words.size() << endl;
-    vector<int> words_after_first_guess = vector<int>(possible_words);
-    for (int j : words_after_first_guess) {
-            setTarget(word_list[j]);
-            addGrey(0, 'a');
-            addGrey(1, 'l');
-            addGrey(2, 'o');
-            addGrey(3, 'e');
-            addGrey(4, 's');
-            makeGuess(first_guess);
-            for (int i : possible_words_saved) {
-                possible_words = vector<int>(words_after_first_guess);
-                makeGuess(word_list[i]);
-                cout << "Second guess: " << word_list[i] << " possible words: " << possible_words.size() << endl;
-            }
-    }
-}*/

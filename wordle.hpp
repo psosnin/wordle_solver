@@ -18,7 +18,7 @@ class WordleSolver
         void addGreen(int position, char letter);
         void addYellow(int position, char letter);
         void addGrey(int position, char letter);
-        void testAll();
+        void testAll(int start = 0, int end = 100);
         void testWord(string test);
         void secondGuess(string first_guess);
         uint64_t stringToInt(string word);
