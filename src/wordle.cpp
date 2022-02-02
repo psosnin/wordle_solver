@@ -16,7 +16,7 @@ WordleSolver::WordleSolver() {
     //read wordlist from file
     word_list = vector<uint64_t>();
 
-    ifstream file_in("word_ints.txt");
+    ifstream file_in("src/word_ints.txt");
     if (!file_in) {
         cout << "file not found" << endl;
     }
@@ -181,6 +181,10 @@ int WordleSolver::makeGuess(uint64_t guess) {
         }
     }
     return possible_words.size();
+}
+
+int WordleSolver::makeGuessString(string guess) {
+    return makeGuess(stringToInt(guess));
 }
 
 void WordleSolver::testAll(int start, int end) {

@@ -15,6 +15,7 @@ class WordleSolver
         void setTargetString(string target);
         void setTargetInt(uint64_t word);
         int makeGuess(uint64_t guess);
+        int makeGuessString(string guess);
         void addGreen(int position, char letter);
         void addYellow(int position, char letter);
         void addGrey(int position, char letter);

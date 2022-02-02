@@ -1,0 +1,5 @@
+/archive
+/.vscode
+/wordle
+/lib/libwordle.so
+/lib/pywordle.so
