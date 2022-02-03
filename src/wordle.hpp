@@ -20,7 +20,7 @@ class WordleSolver
         void addYellow(int position, char letter);
         void addGrey(int position, char letter);
         void testAll(int start = 0, int end = 100);
-        void testWord(string test);
+        vector<int> testWord(string test);
         void secondGuess(string first_guess);
         uint64_t stringToInt(string word);
         string intToString(uint64_t iword);
@@ -33,3 +33,5 @@ class WordleSolver
         uint64_t target;
         map<char, int> target_map;
     };
+
+void testAllMultithread(int n_threads, int n_words);

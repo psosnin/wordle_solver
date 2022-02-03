@@ -189,7 +189,7 @@ int WordleSolver::makeGuessString(string guess) {
 
 void WordleSolver::testAll(int start, int end) {
     //cout << "testing words from " << start << " to " << end << endl;
-    string filename = "output/output_ints" + to_string(start) + "_" + to_string(end) + ".txt";
+    string filename = "data/output" + to_string(start) + "_" + to_string(end) + ".txt";
     ofstream myfile(filename);
     for (int j = start; j < min(end, int(word_list.size())); j++) {
         setTargetInt(word_list[j]);
@@ -201,5 +201,33 @@ void WordleSolver::testAll(int start, int end) {
         if (start == 0 && j%20 == 0) {
             cout << "Thread 1 has processed " << j << "/" << end << " words" << endl;
         }
+    }
+}
+
+vector<int> WordleSolver::testWord(string test) {
+    vector<int> output = vector<int>(word_list.size(), 0);
+    uint64_t guess = stringToInt(test);
+    for (int j = 0; j < word_list.size(); j++) {
+        reset();
+        setTargetInt(word_list[j]);
+        output[j] = makeGuess(guess);
+    }
+    return output;
+}
+
+void initThread(int start, int end) {
+    WordleSolver wordle = WordleSolver();
+    wordle.testAll(start, end);
+}
+
+void testAllMultithread(int n_threads, int n_words) {
+    cout << "don't exit this program until it finishes you might crash :)" << endl;
+    vector<thread> threads;
+    int step = n_words / n_threads + 1;
+    for (int i = 0; i < n_threads; i++) {
+        threads.push_back(thread(initThread, step*i, step*(i+1)));
+    }
+    for (auto &th : threads) {
+        th.join();
     }
 }
