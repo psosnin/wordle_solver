@@ -17,11 +17,11 @@ class WordleSolver
         int makeGuess(uint64_t guess);
         int makeGuessString(string guess);
         void addGreen(int position, char letter);
+        void addYellow(vector<int> position, char letter);
         void addYellowSingle(int position, char letter);
-        void addYellowMany(set<int> position, char letter);
         void addGrey(int position, char letter);
         void addGreySingle(int position, char letter);
-        void addGreyMany(set<int> position, char letter);
+        void addGreyMany(vector<int> position, char letter);
         void testAll(int start = 0, int end = 100);
         vector<int> testWord(string test);
         vector<int> testTarget(string test);

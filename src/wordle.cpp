@@ -127,26 +127,31 @@ void WordleSolver::addYellowSingle(int position, char letter) {
     possible_words = setIntersection(possible_words, yellows);
 }
 
-void WordleSolver::addYellowMany(set<int> position, char letter) {
-    //remove the 2 positions that are yellow
-    for (int i : position) {
-        possible_words = setDifference(possible_words, letter_map[i*26 + int(letter) - 97]);
-    }
-    //now find every combination that has two letters in the other 3 positions
-    vector<int> yellows;
-    vector<int> doubles;
-    for (int j = 0; j < 5; j++) {
-        if (position.find(j) == position.end()) {
-            for (int i = 0; i < 5; i++) {
-                if (position.find(i) == position.end()) {
-                    doubles = setIntersection(letter_map[i*26 + int(letter) - 97], 
-                                              letter_map[j*26 + int(letter) - 97]);
-                    yellows = setUnion(yellows, doubles);
+void WordleSolver::addYellow(vector<int> position, char letter) {
+    if (position.size() == 1) {
+        addYellowSingle(*(position.begin()), letter);
+    } else {
+        //remove the positions that actually are yellow:
+        for (int i : position) {
+            possible_words = setDifference(possible_words, letter_map[i*26 + int(letter) - 97]);
+        }
+        //find all pairs of sets of ints not in positions
+        vector<int> possible_positions = {0,1,2,3,4};
+        possible_positions = setDifference(possible_positions, position);
+        //now find the union of the intersection of all of these pairs
+        vector<int> pairs = vector<int>();
+        for (int i : possible_positions) {
+            for (int j : possible_positions) {
+                if (i != j) {
+                    vector<int> tmp = setIntersection(letter_map[i*26 + int(letter) - 97],
+                                                      letter_map[j*26 + int(letter) - 97]);
+                    pairs = setUnion(tmp, pairs);
                 }
             }
         }
+        //now take the intersection of all possible pairs with the remaining possible words
+        possible_words = setIntersection(possible_words, pairs);
     }
-    possible_words = setIntersection(possible_words, yellows);
 }
 
 
@@ -160,40 +165,24 @@ void WordleSolver::addGreySingle(int position, char letter) {
     possible_words = setDifference(possible_words, letter_map[position*26 + int(letter) - 97]);
 }
 
-void WordleSolver::addGreyMany(set<int> positions, char letter) {
-    for (int i = 0; i < 5; i++) {
-        if (positions.find(i) == positions.end()) {
-            possible_words = setDifference(possible_words, letter_map[i*26 + int(letter) - 97]);
-        }
+void WordleSolver::addGreyMany(vector<int> positions, char letter) {
+    vector<int> greys = {0,1,2,3,4};
+    greys = setDifference(greys, positions);
+    for (int i : greys) {
+        possible_words = setDifference(possible_words, letter_map[i*26 + int(letter) - 97]);
     }
-}
-
-uint64_t WordleSolver::stringToInt(string word) {
-    uint64_t bits = 0;
-    for (int i = 4; i >=0; i--) {
-        bits = (bits << 8) | word[i];
-    }
-    return bits;
-}
-
-string WordleSolver::intToString(uint64_t iword) {
-    string word = "";
-    for (int i = 0; i < 5; i++) {
-        word += char(iword >> 8*i);
-    }
-    return word;
 }
 
 int WordleSolver::makeGuess(uint64_t guess) {
     map<char, int> tmp_map = map<char, int>(target_map);
-    map<char, set<int>> green_map = map<char, set<int>>();
-    map<char, set<int>> yellow_map = map<char, set<int>>();
+    map<char, vector<int>> green_map = map<char, vector<int>>();
+    map<char, vector<int>> yellow_map = map<char, vector<int>>();
     //green
     for (int i = 0; i < 5; i++) {
         if (((guess >> 8*i) & 0xFF) == ((target >> 8*i) & 0xFF)) {
             addGreen(i, char(guess >> 8*i));
             tmp_map[char(guess >> 8*i)]--;
-            green_map[char(guess >> 8*i)].insert(i);
+            green_map[char(guess >> 8*i)].push_back(i);
         }
     }
 
@@ -201,7 +190,7 @@ int WordleSolver::makeGuess(uint64_t guess) {
     for (int j = 0; j < 5; j++) {
         if (tmp_map.find((guess >> 8*j)) != tmp_map.end() && 
             tmp_map[(guess >> 8*j)] > 0 && ((guess >> 8*j) & 0xFF) != ((target >> 8*j) & 0xFF)) {
-            yellow_map[char(guess >> 8*j)].insert(j);
+            yellow_map[char(guess >> 8*j)].push_back(j);
             tmp_map[char(guess >> 8*j)]--;
         } else if (tmp_map.find((guess >> 8*j)) == tmp_map.end()){
             addGrey(j, char(guess >> 8*j));
@@ -213,13 +202,7 @@ int WordleSolver::makeGuess(uint64_t guess) {
     }
 
     for (auto const& [k,v] : yellow_map) {
-        if (v.size() == 1) {
-            addYellowSingle(*(v.begin()), k);
-            cout << "yellow single " << k << endl;
-        } else {
-            addYellowMany(v, k);
-            cout << "yellow many " << k << endl;
-        }
+        addYellow(v, k);
     }
 
     return possible_words.size();
@@ -291,4 +274,21 @@ void testAllMultithread(int n_threads, int n_words) {
     for (auto &th : threads) {
         th.join();
     }
+}
+
+
+uint64_t WordleSolver::stringToInt(string word) {
+    uint64_t bits = 0;
+    for (int i = 4; i >=0; i--) {
+        bits = (bits << 8) | word[i];
+    }
+    return bits;
+}
+
+string WordleSolver::intToString(uint64_t iword) {
+    string word = "";
+    for (int i = 0; i < 5; i++) {
+        word += char(iword >> 8*i);
+    }
+    return word;
 }
