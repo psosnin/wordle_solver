@@ -12,11 +12,13 @@ BOOST_PYTHON_MODULE(pywordle)
 
     class_<WordleSolver>("WordleSolver")
         .def("remainingWords", &WordleSolver::remainingWords)
+        .def("remainingWordList", &WordleSolver::remainingWordList)
         .def("sampleWords", &WordleSolver::sampleWords)
         .def("reset", &WordleSolver::reset)
         .def("setTarget", &WordleSolver::setTargetString)
         .def("makeGuess", &WordleSolver::makeGuessString)
         .def("testWord", &WordleSolver::testWord)
+        .def("testTarget", &WordleSolver::testTarget)
     ;
 
     class_<std::vector<int> >("IntVec")
