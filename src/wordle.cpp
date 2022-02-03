@@ -45,15 +45,20 @@ WordleSolver::WordleSolver() {
     assert(sum == 5*word_list.size());
     
     //initialise possible words set
-    possible_words_saved = vector<int>();
-    for (int j  = 0; j < word_list.size(); j++) {possible_words_saved.push_back(j);} 
-    possible_words = vector<int>(possible_words_saved);
+    possible_words_reset = vector<int>();
+    for (int j  = 0; j < word_list.size(); j++) {possible_words_reset.push_back(j);} 
+    possible_words = vector<int>(possible_words_reset);
+    possible_words_last = vector<int>(possible_words_reset);
     //set target word
     setTargetString("start");
 }
 
 void WordleSolver::reset() {
-    possible_words = vector<int>(possible_words_saved);
+    possible_words = vector<int>(possible_words_reset);
+}
+
+void WordleSolver::resetLastGuess() {
+    possible_words = vector<int>(possible_words_last);
 }
 
 int WordleSolver::remainingWords() {
@@ -173,7 +178,10 @@ void WordleSolver::addGreyMany(vector<int> positions, char letter) {
     }
 }
 
-int WordleSolver::makeGuess(uint64_t guess) {
+int WordleSolver::makeGuess(uint64_t guess, bool save) {
+    if (save) {
+        possible_words_last = vector<int>(possible_words);
+    }
     map<char, int> tmp_map = map<char, int>(target_map);
     map<char, vector<int>> green_map = map<char, vector<int>>();
     map<char, vector<int>> yellow_map = map<char, vector<int>>();
@@ -188,7 +196,9 @@ int WordleSolver::makeGuess(uint64_t guess) {
 
     //yellow and grey
     for (int j = 0; j < 5; j++) {
-        if (tmp_map.find((guess >> 8*j)) != tmp_map.end() && 
+        if (((guess >> 8*j) & 0xFF) == ((target >> 8*j) & 0xFF)) {
+            continue;
+        } else if (tmp_map.find((guess >> 8*j)) != tmp_map.end() && 
             tmp_map[(guess >> 8*j)] > 0 && ((guess >> 8*j) & 0xFF) != ((target >> 8*j) & 0xFF)) {
             yellow_map[char(guess >> 8*j)].push_back(j);
             tmp_map[char(guess >> 8*j)]--;
@@ -208,8 +218,8 @@ int WordleSolver::makeGuess(uint64_t guess) {
     return possible_words.size();
 }
 
-int WordleSolver::makeGuessString(string guess) {
-    return makeGuess(stringToInt(guess));
+int WordleSolver::makeGuessString(string guess, bool save) {
+    return makeGuess(stringToInt(guess), save);
 }
 
 void WordleSolver::testAll(int start, int end) {

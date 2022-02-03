@@ -19,6 +19,7 @@ BOOST_PYTHON_MODULE(pywordle)
         .def("makeGuess", &WordleSolver::makeGuessString)
         .def("testWord", &WordleSolver::testWord)
         .def("testTarget", &WordleSolver::testTarget)
+        .def("resetLastGuess", &WordleSolver::resetLastGuess)
     ;
 
     class_<std::vector<int> >("IntVec")

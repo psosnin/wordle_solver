@@ -12,16 +12,9 @@ class WordleSolver
         int remainingWords();
         void sampleWords(int n = 5);
         void reset();
+        void resetLastGuess();
         void setTargetString(string target);
-        void setTargetInt(uint64_t word);
-        int makeGuess(uint64_t guess);
-        int makeGuessString(string guess);
-        void addGreen(int position, char letter);
-        void addYellow(vector<int> position, char letter);
-        void addYellowSingle(int position, char letter);
-        void addGrey(int position, char letter);
-        void addGreySingle(int position, char letter);
-        void addGreyMany(vector<int> position, char letter);
+        int makeGuessString(string guess, bool save = false);
         void testAll(int start = 0, int end = 100);
         vector<int> testWord(string test);
         vector<int> testTarget(string test);
@@ -31,12 +24,21 @@ class WordleSolver
         vector<int> remainingWordList();
 
     private:
+        int makeGuess(uint64_t guess, bool save = false);
+        void setTargetInt(uint64_t word);
+        void addGreen(int position, char letter);
+        void addYellow(vector<int> position, char letter);
+        void addYellowSingle(int position, char letter);
+        void addGrey(int position, char letter);
+        void addGreySingle(int position, char letter);
+        void addGreyMany(vector<int> position, char letter);
         vector<int> setDifference(vector<int> v1, vector<int> v2);
         vector<int> setUnion(vector<int> v1, vector<int> v2);
         vector<int> setIntersection(vector<int> v1, vector<int> v2);
         vector<vector<int>> letter_map;
         vector<int> possible_words;
-        vector<int> possible_words_saved;
+        vector<int> possible_words_last;
+        vector<int> possible_words_reset;
         vector<uint64_t> word_list;
         uint64_t target;
         map<char, int> target_map;
