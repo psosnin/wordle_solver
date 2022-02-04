@@ -22,10 +22,11 @@ class WordleSolver
         uint64_t stringToInt(string word);
         string intToString(uint64_t iword);
         vector<int> remainingWordList();
-
-    private:
+        vector<uint64_t> getWordList();
         int makeGuess(uint64_t guess, bool save = false);
         void setTargetInt(uint64_t word);
+
+    private:
         void addGreen(int position, char letter);
         void addYellow(vector<int> position, char letter);
         void addYellowSingle(int position, char letter);
@@ -45,3 +46,4 @@ class WordleSolver
     };
 
 void testAllMultithread(int n_threads, int n_words);
+void searchForWorst(int n_threads);

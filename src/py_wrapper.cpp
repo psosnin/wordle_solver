@@ -9,6 +9,7 @@ BOOST_PYTHON_MODULE(pywordle)
     using namespace boost::python;
 
     def("testAll", &testAllMultithread);
+    def("searchForWorst", &searchForWorst);
 
     class_<WordleSolver>("WordleSolver")
         .def("remainingWords", &WordleSolver::remainingWords)

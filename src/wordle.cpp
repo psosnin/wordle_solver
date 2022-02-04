@@ -268,6 +268,9 @@ vector<int> WordleSolver::remainingWordList() {
     return possible_words;
 }
 
+vector<uint64_t> WordleSolver::getWordList() {
+    return word_list;
+}
 
 void initThread(int start, int end) {
     WordleSolver wordle = WordleSolver();
@@ -280,6 +283,75 @@ void testAllMultithread(int n_threads, int n_words) {
     int step = n_words / n_threads + 1;
     for (int i = 0; i < n_threads; i++) {
         threads.push_back(thread(initThread, step*i, step*(i+1)));
+    }
+    for (auto &th : threads) {
+        th.join();
+    }
+}
+
+vector<uint64_t> computeNextGuess(vector<uint64_t> guesses, WordleSolver &wordle) {
+    wordle.reset();
+    uint64_t worst_guess = 0;
+    int worst_remaining = -1;
+    for (uint64_t guess : guesses) {
+        wordle.makeGuess(guess);
+    }
+    vector<int> valid_indices = wordle.remainingWordList();
+    for (int test : valid_indices) {
+        wordle.reset();
+        for (uint64_t guess : guesses) {
+            wordle.makeGuess(guess);
+        }
+        int remaining = wordle.makeGuess(wordle.getWordList()[test]);
+        if (remaining > worst_remaining) {
+            worst_guess = wordle.getWordList()[test];
+            worst_remaining = remaining;
+        }
+    }
+    guesses.push_back(worst_guess);
+    return guesses;
+}
+
+void initSearch(int seed) {
+    WordleSolver wordle = WordleSolver();
+    vector<uint64_t> word_list = wordle.getWordList();
+    int max_len = 0;
+    int i = seed;
+    for (int t = 0; t < word_list.size(); t++) {
+        uint64_t target = word_list[t];
+        if (seed == 0 && t % 20 == 0) {
+            cout << "Thread 1 has processed " << t << " / " << word_list.size() << " targets" << endl;
+        }
+        i = (i + 1) % 8;
+        wordle.setTargetInt(target);
+        while (i < word_list.size()) {
+            uint64_t first_guess = word_list[i];
+            i = i + 50;
+            vector<uint64_t> guesses = {first_guess};
+            while (guesses.size() < 2 ||
+                   guesses[guesses.size() - 1] != 
+                   guesses[guesses.size() - 2]) {
+                guesses = computeNextGuess(guesses, wordle);
+            }
+            if (guesses.size() > max_len) {
+                if (guesses.size() > 8) {
+                    cout << "Thread " << seed << " found: ";
+                    for (uint64_t guess : guesses) {
+                        cout << wordle.intToString(guess) << ", ";
+                    }
+                    cout << endl;
+                }
+                max_len = guesses.size();
+            }
+        }
+    }
+}
+
+void searchForWorst(int n_threads) {
+    cout << "don't exit this program until it finishes you might crash :)" << endl;
+    vector<thread> threads;
+    for (int i = 0; i < n_threads; i++) {
+        threads.push_back(thread(initSearch, i));
     }
     for (auto &th : threads) {
         th.join();
