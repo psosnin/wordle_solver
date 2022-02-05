@@ -8,19 +8,16 @@ BOOST_PYTHON_MODULE(pywordle)
 {
     using namespace boost::python;
 
-    def("testAll", &testAllMultithread);
-    def("searchForWorst", &searchForWorst);
-
+    //def("testAll", &testAllMultithread);
     class_<WordleSolver>("WordleSolver")
         .def("remainingWords", &WordleSolver::remainingWords)
         .def("remainingWordList", &WordleSolver::remainingWordList)
         .def("sampleWords", &WordleSolver::sampleWords)
         .def("reset", &WordleSolver::reset)
-        .def("setTarget", &WordleSolver::setTargetString)
-        .def("makeGuess", &WordleSolver::makeGuessString)
-        .def("testWord", &WordleSolver::testWord)
-        .def("testTarget", &WordleSolver::testTarget)
-        .def("resetLastGuess", &WordleSolver::resetLastGuess)
+        .def("setTarget", &WordleSolver::setTarget)
+        .def("makeGuess", &WordleSolver::makeGuess)
+        .def("wordsWithPos", &WordleSolver::wordsWithPos)
+        .def("wordsWithFreq", &WordleSolver::wordsWithFreq)
     ;
 
     class_<std::vector<int> >("IntVec")
