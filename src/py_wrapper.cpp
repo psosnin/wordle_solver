@@ -18,10 +18,16 @@ BOOST_PYTHON_MODULE(pywordle)
         .def("makeGuess", &WordleSolver::makeGuess)
         .def("wordsWithPos", &WordleSolver::wordsWithPos)
         .def("wordsWithFreq", &WordleSolver::wordsWithFreq)
+        .def("generateCrossTable", &WordleSolver::generateCrossTable)
     ;
 
     class_<std::vector<int> >("IntVec")
         .def(vector_indexing_suite<std::vector<int> >())
         .def("size", &vector_indexing_suite<std::vector<int> >::size)
+    ;
+
+    class_<std::vector<vector<int>> >("IntVecVec")
+        .def(vector_indexing_suite<std::vector<vector<int>> >())
+        .def("size", &vector_indexing_suite<std::vector<vector<int>> >::size)
     ;
 }

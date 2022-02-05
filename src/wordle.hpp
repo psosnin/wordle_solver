@@ -20,6 +20,7 @@ class WordleSolver
         vector<uint64_t> getWordList();
         int makeGuess(int guess_index);
         void setTarget(int index);
+        vector<vector<int>> generateCrossTable();
 
     private:
         void generateLetterMaps();

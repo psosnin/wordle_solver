@@ -184,3 +184,22 @@ string WordleSolver::intToString(uint64_t iword) {
     }
     return word;
 }
+
+vector<vector<int>> WordleSolver::generateCrossTable() {
+    vector<vector<int>> results = vector<vector<int>> (word_list.size(), 
+                                                       vector<int>(word_list.size(), 0));
+    //results[target, guess]
+    for (int i = 0; i < word_list.size(); i++) {
+        setTarget(i);
+        for (int j = 0; j < word_list.size(); j++) {
+            if (results[i][j] == 0) {
+                reset();
+                results[i][j] = makeGuess(j);
+                for (int k : possible_words) {
+                    results[k][j] = possible_words.size();
+                }
+            }
+        }
+    }
+    return results;
+}
