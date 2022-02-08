@@ -1,10 +1,10 @@
 CXX := clang++
-CFLAGS := -O3 -std=c++20 -g
-INCLUDE := -Iinclude
+CFLAGS := -O3 -std=c++20 -g -fopenmp
+INCLUDE := -Iinclude -Isrc/wordle.hpp
 PYINCLUDE := -I/usr/include/python3.10
 BOOST := -lpython3.10 -lboost_python3 -lpthread
 
-LIB_SRC := src/wordle.cpp
+LIB_SRC := src/wordle.cpp src/utils.cpp
 WRAPPER := src/py_wrapper.cpp
 LIB := lib/libwordle.so
 PYLIB := lib/pywordle.so
